@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple, Callable
+from typing import Callable
 
 import torch
 from torch.optim.optimizer import Optimizer
@@ -11,27 +11,27 @@ def exists(val):
 
 # class
 
-class Lion(Optimizer):
+class SmoothedSignSGD(Optimizer):
     def __init__(
         self,
         params,
         lr: float = 1e-4,
-        betas: Tuple[float, float] = (0.9, 0.99),
+        beta: float = 0.9,
         weight_decay: float = 0.0,
         decoupled_weight_decay: bool = False
     ):
         assert lr > 0.
-        assert all([0. <= beta <= 1. for beta in betas])
-        assert all([hasattr(torch, f'_foreach_{attr}_') for attr in ('mul', 'add', 'sign', 'lerp')]), 'this version of torch does not have the prerequisite foreach functions'
+        if not (0. <= beta < 1.):
+            raise ValueError(f"beta must be in [0, 1); got {beta}")
+        assert all([hasattr(torch, f'_foreach_{attr}_') for attr in ('mul', 'add', 'lerp')]), 'this version of torch does not have the prerequisite foreach functions'
+
+        needed_outplace = ("sign",)
+        assert all(hasattr(torch, f"_foreach_{fn}") for fn in needed_outplace)
 
         self._init_lr = lr
         self.decoupled_wd = decoupled_weight_decay
 
-        defaults = dict(
-            lr = lr,
-            betas = betas,
-            weight_decay = weight_decay
-        )
+        defaults = dict(lr=lr, beta=beta, weight_decay=weight_decay)
 
         super().__init__(params, defaults)
 
@@ -48,7 +48,7 @@ class Lion(Optimizer):
 
         for group in self.param_groups:
 
-            lr, wd, beta1, beta2, decoupled_wd, init_lr = group['lr'], group['weight_decay'], *group['betas'], self.decoupled_wd, self._init_lr
+            lr, wd, beta, decoupled_wd, init_lr = group['lr'], group['weight_decay'], group['beta'], self.decoupled_wd, self._init_lr
 
             # maybe decoupled weight decay
 
@@ -76,21 +76,19 @@ class Lion(Optimizer):
                 grads.append(grad)
                 exp_avgs.append(exp_avg)
 
+            if not params:  # nothing to do in this param-group
+                continue
+
             # stepweight decay
 
-            if wd > 0.:
+            if wd != 0.:
                 torch._foreach_mul_(params, 1. - lr * wd)
 
             # weight update
 
-            updates = [t.clone() for t in exp_avgs]
-            torch._foreach_lerp_(updates, grads, 1. - beta1)
-            torch._foreach_sign_(updates)
+            signs = torch._foreach_sign(grads)
+            torch._foreach_lerp_(exp_avgs, signs, 1.0 - beta)
 
-            torch._foreach_add_(params, updates, alpha = -lr)
-
-            # decay momentum running average
-
-            torch._foreach_lerp_(exp_avgs, grads, 1. - beta2)
+            torch._foreach_add_(params, exp_avgs, alpha=-lr)
 
         return loss
