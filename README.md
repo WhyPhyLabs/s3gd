@@ -30,14 +30,11 @@ A summarization of previous updates: as shown in the <a href="https://api.wandb.
 
 - Update 7: would only recommend this optimizer in the setting of high batch sizes (64 or above)
 
-## Install
+## Install 
 
 ```bash
-$ pip install lion-pytorch
-```
-Alternatively, using conda:
-```bash
-$ conda install lion-pytorch
+$ git clone https://github.com/WhyPhyLabs/smoothed-sign-sgd.git
+$ pip install .
 ```
 
 ## Usage
@@ -52,9 +49,9 @@ model = nn.Linear(10, 1)
 
 # import Lion and instantiate with parameters
 
-from lion_pytorch import Lion
+from smoothed_sign_sgd import SmoothedSignSGD
 
-opt = Lion(model.parameters(), lr=1e-4, weight_decay=1e-2)
+opt = SmoothedSignSGD(model.parameters(), lr=1e-4, weight_decay=1e-2)
 
 # forward and backwards
 
@@ -70,7 +67,7 @@ opt.zero_grad()
 To use a fused kernel for updating the parameters, first `pip install triton -U --pre`, then
 
 ```python
-opt = Lion(
+opt = SmoothedSignSGD(
     model.parameters(),
     lr=1e-4,
     weight_decay=1e-2,
