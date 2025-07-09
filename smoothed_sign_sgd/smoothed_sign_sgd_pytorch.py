@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple, Callable
+from typing import Callable
 
 import torch
 from torch.optim.optimizer import Optimizer
@@ -11,51 +11,48 @@ def exists(val):
 
 # update functions
 
-def update_fn(p, grad, exp_avg, lr, wd, beta1, beta2):
+def smoothed_signsgd_step(p, grad, exp_avg, lr, wd, beta):
     # stepweight decay
 
     p.data.mul_(1. - lr * wd)
 
     # weight update
 
-    update = exp_avg.clone().mul_(beta1).add(grad, alpha = 1. - beta1).sign_()
-    p.add_(update, alpha = -lr)
+    exp_avg.mul_(beta).add_(grad.sign(), alpha=1.0 - beta)
 
     # decay the momentum running average coefficient
 
-    exp_avg.mul_(beta2).add_(grad, alpha = 1. - beta2)
+    p.add_(exp_avg, alpha=-lr)
 
 # class
 
-class Lion(Optimizer):
+class SmoothedSignSGD(Optimizer):
     def __init__(
         self,
         params,
         lr: float = 1e-4,
-        betas: Tuple[float, float] = (0.9, 0.99),
+        beta: float = 0.9,
         weight_decay: float = 0.0,
         use_triton: bool = False,
         decoupled_weight_decay: bool = False,
     ):
-        assert lr > 0.
-        assert all([0. <= beta <= 1. for beta in betas])
+        if not 0.0 <= beta < 1.0:
+            raise ValueError(f'β should be in [0,1); got {beta}')
+        if lr <= 0.0:
+            raise ValueError(f'lr must be positive; got {lr}')
 
         self._init_lr = lr
         self.decoupled_wd = decoupled_weight_decay
 
-        defaults = dict(
-            lr = lr,
-            betas = betas,
-            weight_decay = weight_decay
-        )
+        defaults = dict(lr=lr, beta=beta, weight_decay=weight_decay)
 
         super().__init__(params, defaults)
 
-        self.update_fn = update_fn
+        self.update_fn = smoothed_signsgd_step
 
         if use_triton:
-            from lion_pytorch.triton import update_fn as triton_update_fn
-            self.update_fn = triton_update_fn
+            from smoothed_sign_sgd.triton import smoothed_signsgd_step as triton_smoothed_signsgd_step
+            self.update_fn = triton_smoothed_signsgd_step
 
     @torch.no_grad()
     def step(
@@ -71,7 +68,7 @@ class Lion(Optimizer):
         for group in self.param_groups:
             for p in filter(lambda p: exists(p.grad), group['params']):
 
-                grad, lr, wd, beta1, beta2, state, decoupled_wd, init_lr = p.grad, group['lr'], group['weight_decay'], *group['betas'], self.state[p], self.decoupled_wd, self._init_lr
+                grad, lr, wd, beta, state, decoupled_wd, init_lr = p.grad, group['lr'], group['weight_decay'], group['beta'], self.state[p], self.decoupled_wd, self._init_lr
 
                 # maybe decoupled weight decay
 
@@ -91,8 +88,7 @@ class Lion(Optimizer):
                     exp_avg,
                     lr,
                     wd,
-                    beta1,
-                    beta2
+                    beta
                 )
 
         return loss
