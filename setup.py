@@ -16,7 +16,7 @@ setup(
     'optimizers'
   ],
   install_requires=[
-    'torch>=2.2'
+    'torch>=2.3'
   ],
   classifiers=[
     'Development Status :: 4 - Beta',
