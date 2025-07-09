@@ -1,22 +1,22 @@
 from setuptools import setup, find_packages
 
 setup(
-  name = 'lion-pytorch',
+  name = 'smoothed-sign-sgd-pytorch',
   packages = find_packages(exclude=[]),
   version = '0.2.3',
   license='MIT',
-  description = 'Lion Optimizer - Pytorch',
-  author = 'Phil Wang',
-  author_email = 'lucidrains@gmail.com',
+  description = 'Smoothed SignSGD Optimizer - Pytorch',
+  author = 'Aria Bagheri',
+  author_email = 'aria@whyphy.ai',
   long_description_content_type = 'text/markdown',
-  url = 'https://github.com/lucidrains/lion-pytorch',
+  url = 'https://github.com/WhyPhyLabs/smoothed-sign-sgd',
   keywords = [
     'artificial intelligence',
     'deep learning',
     'optimizers'
   ],
   install_requires=[
-    'torch>=1.6'
+    'torch>=2.2'
   ],
   classifiers=[
     'Development Status :: 4 - Beta',
