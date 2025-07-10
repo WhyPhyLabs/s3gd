@@ -7,7 +7,7 @@ FP8 instructions are only available on SM 90 or newer. The kernel will compile o
 ## Install 
 
 ```bash
-$ git clone https://github.com/WhyPhyLabs/smoothed-sign-sgd.git
+$ git clone https://github.com/WhyPhyLabs/s3gd.git
 
 $ pip install .
 ```
@@ -15,7 +15,7 @@ $ pip install .
 ## Usage Examples
 
 ```python
-1) bf16 maths + fp8 state on Hopper / H200
+# bf16 maths + fp8 state on Hopper / H200
 p        = torch.zeros_like(w0, dtype=torch.bfloat16, device="cuda")
 g        = torch.zeros_like(w0, dtype=torch.bfloat16, device="cuda")
 momentum = torch.zeros_like(w0, dtype=torch.float8_e4m3fn, device="cuda")
@@ -28,7 +28,7 @@ smoothed_signsgd_step(
 )
 
 
-2) all-bf16 fallback (Ampere GPUs don’t support FP8)
+# all-bf16 fallback (Ampere GPUs don’t support FP8)
 smoothed_signsgd_step(
     p_bf16, g_bf16, m_bf16,
     lr=1e-2, wd=0., beta=0.95,
