@@ -14,12 +14,12 @@ $ pip install .
 
 ## Usage Examples
 
+### bf16 maths + fp8 state on Hopper / H200
+
 ```python
-# bf16 maths + fp8 state on Hopper / H200
 p        = torch.zeros_like(w0, dtype=torch.bfloat16, device="cuda")
 g        = torch.zeros_like(w0, dtype=torch.bfloat16, device="cuda")
 momentum = torch.zeros_like(w0, dtype=torch.float8_e4m3fn, device="cuda")
-
 
 smoothed_signsgd_step(
     p, g, momentum,
@@ -27,8 +27,10 @@ smoothed_signsgd_step(
     math_dtype="bf16", state_dtype="fp8e4",
 )
 
+```
 
-# all-bf16 fallback (Ampere GPUs don’t support FP8)
+### all-bf16 fallback (Ampere GPUs don’t support FP8)
+```python
 smoothed_signsgd_step(
     p_bf16, g_bf16, m_bf16,
     lr=1e-2, wd=0., beta=0.95,
