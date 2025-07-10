@@ -50,7 +50,7 @@ opt = SmoothedSignSGD(
 ## Citations
 
 ```bibtex
-@online{kalomaze2025tweet,
+@misc{kalomaze2025tweet,
 	url = {https://x.com/kalomaze/status/1940424032119316813},
 	author = {kalomaze},
 	title = {On Adam with aggressive gradient clipping causing sparse updates},
