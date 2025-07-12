@@ -1,6 +1,6 @@
 ## S3GD
 
-S3GD is a highly-optimized, PyTorch-compatible Triton implementation of the Smoothed SignSGD optimizer, meant for reinforcement learning post-training. You can find more information in our <a href="https://whyphy.ai/blog">blog post</a>.  
+S3GD is a highly optimized, PyTorch-compatible Triton implementation of the Smoothed SignSGD optimizer, meant for reinforcement learning post-training. You can find more information in our <a href="https://whyphy.ai/blog">blog post</a>.  
   
 FP8 instructions are only available on SM 90 or newer. The kernel will compile on earlier generations if you use a state_dtype other than FP8.
 
