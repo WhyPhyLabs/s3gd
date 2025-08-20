@@ -52,6 +52,15 @@ opt = SmoothedSignSGD(
 ## Citations
 
 ```bibtex
+@misc{cesista2025adamagressiveclipping,
+	url = {http://leloykun.github.io/ponder/adam-aggressive-clipping/},
+	author = {Franz Louis Cesista},
+	title = {Adam with Agressive Gradient Clipping ≈ Smoothed SignSGD/NormSGD},
+	year = {2025}
+}
+```
+
+```bibtex
 @misc{kalomaze2025tweet,
 	url = {https://x.com/kalomaze/status/1940424032119316813},
 	author = {kalomaze},
@@ -61,11 +70,11 @@ opt = SmoothedSignSGD(
 ```
 
 ```bibtex
-@misc{cesista2025adamagressiveclipping,
-	url = {http://leloykun.github.io/ponder/adam-aggressive-clipping/},
-	author = {Franz Louis Cesista},
-	title = {Adam with Agressive Gradient Clipping ≈ Smoothed SignSGD/NormSGD},
-	year = {2025}
+@misc{lucidrains,
+	url = {https://github.com/lucidrains/lion-pytorch},
+	author = {Phil Wang},
+	title = {lion-pytorch},
+	year = {2024}
 }
 ```
 
@@ -80,10 +89,11 @@ opt = SmoothedSignSGD(
 ```
 
 ```bibtex
-@misc{lucidrains,
-	url = {https://github.com/lucidrains/lion-pytorch},
-	author = {Phil Wang},
-	title = {lion-pytorch},
-	year = {2024}
+@misc{narayan2025munit,
+	url = {[https://arxiv.org/abs/2302.06675](https://arxiv.org/abs/2502.05967)},
+	author = {Narayan, Saaketh and Gupta, Abhay and Paul, Mansheej and Blalock, Davis},
+	title = {μnit Scaling: Simple and Scalable FP8 LLM Training},
+	publisher = {arXiv},
+	year = {2025}
 }
 ```
